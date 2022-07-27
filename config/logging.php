@@ -1,8 +1,8 @@
 <?php
 
 use Monolog\Handler\NullHandler;
-use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogUdpHandler;
+use \Handler\StreamHandler;
+use \Handler\SyslogUdpHandler;
 
 return [
 
