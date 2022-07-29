@@ -8,13 +8,23 @@
 
 
     <div class="card">
-        <form action="" method="get" class="card-header">
+    <form action="#" method="GET" class="form-filter form-create">
             <div class="form-row justify-content-between">
                 <div class="col-md-2">
-                    <input type="text" name="title" placeholder="Product Title" class="form-control">
+                    <input type="text" name="title" id="filter_title" placeholder="Product Title" class="form-control">
                 </div>
                 <div class="col-md-2">
-                    <select name="variant" id="" class="form-control">
+                    <select name="variant" id="filter_variant" class="form-control">
+                    <option value="">-- Select A Variant--</option>
+                    
+                            @foreach($variantsname as $varientname)
+                            <option value="">&ensp;{{$varientname->title}}</option>
+                            @foreach($varientname->productVariant as $pro_variant)
+                            @if($pro_variant->variant_id == $varientname->id)
+                            &ensp<option value="{{ $pro_variant->variant}}">&emsp;&emsp;{{$pro_variant->variant }}</option>
+                            @endif
+                            @endforeach
+                            @endforeach
 
                     </select>
                 </div>
@@ -24,15 +34,15 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">Price Range</span>
                         </div>
-                        <input type="text" name="price_from" aria-label="First name" placeholder="From" class="form-control">
-                        <input type="text" name="price_to" aria-label="Last name" placeholder="To" class="form-control">
+                        <input type="text" name="price_from" id="filter_fprice aria-label="First name" placeholder="From" class="form-control">
+                        <input type="text" name="price_to" id="filter_tprice" aria-label="Last name" placeholder="To" class="form-control">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <input type="date" id="mDate" name="date" placeholder="Date" class="form-control">
+                    <input type="date" id="filter_date" name="date" placeholder="Date" class="form-control">
                 </div>
                 <div class="col-md-1">
-                    <button type="submit" class="btn btn-primary float-right"><i class="fa fa-search"></i></button>
+                    <button type="submit" id="filter" class="btn btn-primary float-right"><i class="fa fa-search"></i></button>
                 </div>
             </div>
         </form>
@@ -51,69 +61,86 @@
                     </tr>
                     </thead>
 
-                    <tbody>
 
-                    @foreach($products as $key=>$product)
+                    <!-- <tbody>
 
-                    <tr>
-                        <td>{{ $key +1 }}</td>
-                        <td>{{ $product->title }} <br> Created at : {{$product->created_at->format('j-M-Y')}}</td>
-                        <td style="width: 20%; overflow: hidden">{{ nl2br($product->description) }}</td>
-                        <td>
-                            <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
-                            @foreach($product->productVariantPrice as $varient)
+                        <tr>
+                            <td>1</td>
+                            <td>T-Shirt <br> Created at : 25-Aug-2020</td>
+                            <td>Quality product in low cost</td>
+                            <td>
+                                <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
 
-                                @foreach($varient->productVariant as $varients)
+                                    <dt class="col-sm-3 pb-0">
+                                        SM/ Red/ V-Nick
+                                    </dt>
+                                    <dd class="col-sm-9">
+                                        <dl class="row mb-0">
+                                            <dt class="col-sm-4 pb-0">Price : {{ number_format(200,2) }}</dt>
+                                            <dd class="col-sm-8 pb-0">InStock : {{ number_format(50,2) }}</dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+                                <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more</button>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ route('product.edit', 1) }}" class="btn btn-success">Edit</a>
+                                </div>
+                            </td>
+                        </tr>
 
-                                <dt class="col-sm-3 pb-0">
-                                {{$varients->variant_id == 2 ? $varients->variant : ''}} / {{$varients->variant_id == 1 ? $varients->variant : ''}} / {{$varients->variant_id==3 ? $varients->variant : ''}}
-                                </dt>
-                                @endforeach
+                    </tbody> -->
 
-                                <dd class="col-sm-9">
-                                    <dl class="row mb-0">
-                                        <dt class="col-sm-4 pb-0">Price : {{ $varient->price, number_format(200,2) }}</dt>
-                                        <dd class="col-sm-8 pb-0">InStock : {{ $varient->stock, number_format(50,2) }}</dd>
-                                    </dl>
-                                </dd>
-
-                        @endforeach
-                            </dl>
-                            <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more</button>
-                        </td>
-                        <td>
-                            <div class="btn-group btn-group-sm">
-                                <a href="{{ route('product.edit', 1) }}" class="btn btn-success">Edit</a>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                    </tbody>
                 </table>
             </div>
 
-        </div>
-
-        <div class="card-footer">
-            <div class="row justify-content-between">
-                <div class="col-md-6">
-                    <p>Showing 1 to 10 out of 100</p>
-                </div>
-                <div class="col-md-2">
-                </div>
-            </div>
         </div>
     </div>
 @endsection
 @push('scripts')
 <script>
 
+$(function() {
+
+    var table = $('#dataTable').DataTable({
+                processing: true,
+                serverSide: true,
+                lengthChange: false,
+                searching: false,
+                order: [[0, "desc"]],
+                lengthMenu: [[10, 20, 50, -1], [10, 20, 50, "All"]],
+                mark: true,
+                language: {
+                    infoFiltered: "",
+                    info: "Showing _START_ to _END_ out of _TOTAL_ ",
+                    infoEmpty: ""
+                },
+                columns: [
+                    {data: 'id', name: 'id'},
+                    {data: 'title', name: 'title'},
+                    {data: 'description', name: 'description'},
+                    {data: 'variant', name: 'variant'},
+                    {data: 'action', name: 'Action'}
+
+    
+                ],
+                ajax: {
+                    url: '{{ route("product.data") }}',
+                    data: function (d) {
+                        $(".form-filter").serializeArray().map(function (x) {
+                            d[x.name] = x.value;
+                        });
+                    }
+                }
+            });
+            $('.form-filter').on('submit', function (e) {
+                table.draw();
+                e.preventDefault();
+            });
 
 
-
-$(document).ready( function () {
-    $('#dataTable').DataTable();
-} );
+});
 </script>
     
 @endpush

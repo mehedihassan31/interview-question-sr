@@ -23,7 +23,10 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::resource('product-variant', 'VariantController');
+    Route::get('/productdata', 'ProductController@data')->name('product.data');
+
     Route::resource('product', 'ProductController');
+
     Route::resource('blog', 'BlogController');
     Route::resource('blog-category', 'BlogCategoryController');
 });
